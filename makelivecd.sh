@@ -9,7 +9,7 @@ configure_archbootstrap() {
     md5=$(cat md5sum |grep -F '.tar.gz')
     bootstrap_tarball=$(awk '{print $2;}' <<< "$md5")
     echo "$md5" > md5sum
-    echo "$bootstrap_tarball" |python3 -c 'print(input().split("-")[2]) > version
+    echo "$bootstrap_tarball" |python3 -c 'print(input().split("-")[2])' > version
     curl -o "$bootstrap_tarball" "${MIRROR}/${ISO_DIR}/${bootstrap_tarball}"
     md5sum -c md5sum
     tar xzf "$bootstrap_tarball"
@@ -92,7 +92,7 @@ finalize() {
 if [ -e '/etc/debian_version' ]; then
     configure_archbootstrap
     arch-chroot
-elif [ -e '/etc/arch-release']; then
+elif [ -e '/etc/arch-release' ]; then
     makelivecd
     finalize
 else
