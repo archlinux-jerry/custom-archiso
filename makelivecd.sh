@@ -17,6 +17,7 @@ configure_archbootstrap() {
 arch-chroot() {
     cp -av $0 ./root.x86_64/$0
     cp -av version ./root.x86_64/version
+    mount --bind root.x86_64 root.x86_64
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash $0
 }
 
