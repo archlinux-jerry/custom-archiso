@@ -33,17 +33,18 @@ jobs:
     # upload files
     - name: Upload files
       env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        GITHUB_OWNER: ${{ secrets.OWNER }}
+        RSYNC_HOST: ${{ secrets.HOST }}
+        RSYNC_PATH: ${{ secrets.PATH }}
+        KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
+        SSHPRIVKEY: ${{ secrets.KEY }}
       shell: bash
       run: |
-        sudo apt install -y tree
+        sudo apt update -qq
+        sudo apt install -y tree rsync openssh-client
         cd root.x86_64/livecd/archlive
         sudo chown -R $UID upload
-        cd upload
-        git init
-        git config user.name "bot"
-        git config user.email "bot@github.com"
-        git add .
-        git commit -m "$(TZ='UTC' date +@%Y%m%d)"
-        git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${GITHUB_OWNER}/archlive-ultralite.git" HEAD:out
+        tree -a upload
+        echo "$KNOWN_HOST" >kh
+        echo "$SSHPRIVKEY" |base64 -d >key
+        rsync --rsh "ssh -i key -o StrictHostKeyChecking=ask UserKnownHostsFile=kh" --delete --recursive upload/ "{RSYNC_HOST}:{RSYNC_PATH}" || (shred kh key; exit 1)
+        shred kh key
