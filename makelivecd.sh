@@ -78,7 +78,7 @@ wvdial
 xfsprogs
 linux
 EOF
-    build.sh -v
+    ./build.sh -v
 }
 finalize() {
     mkdir upload
