@@ -26,7 +26,7 @@ makelivecd() {
     echo 'Server = https://mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
     pacman-key --init
     pacman-key --populate archlinux
-    pacman --noconfirm -Syu archiso
+    pacman --noconfirm --needed -Syu base base-devel archiso
     mkdir -p livecd
     cd livecd
     cp -r /usr/share/archiso/configs/releng/ archlive
