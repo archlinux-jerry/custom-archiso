@@ -43,8 +43,18 @@ jobs:
         sudo apt install -y tree rsync openssh-client
         cd root.x86_64/livecd/archlive
         sudo chown -R $UID upload
-        tree -a upload
-        echo "$KNOWN_HOST" >kh
-        echo "$SSHPRIVKEY" |base64 -d >key
-        rsync --rsh "ssh -i key -o StrictHostKeyChecking=ask UserKnownHostsFile=kh" --delete --recursive upload/ "{RSYNC_HOST}:{RSYNC_PATH}" || (shred kh key; exit 1)
+        sudo chown $UID .
+        tree -a upload || true
+        echo "Setting up KNOWN_HOST..."
+        echo "$KNOWN_HOST" > kh
+        echo "Setting up PRIV_KEY  ..."
+        echo "$SSHPRIVKEY" |base64 -d > key
+        chmod 0600 key
+        echo "ASSERTING            ..."
+        [ -n "$RSYNC_HOST" ] || (echo RSYNC_HOST is not set; exit 1)
+        [ -n "$RSYNC_PATH" ] || (echo RSYNC_PATH is not set; exit 1)
+        [ -n "$KNOWN_HOST" ] || (echo KNOWN_HOST is not set; exit 1)
+        [ -n "$SSHPRIVKEY" ] || (echo SSHPRIVKEY is not set; exit 1)
+        echo "Starting Upload      ..."
+        rsync --delete -rvPh -e "ssh -l ${RSYNC_HOST%@*} -i key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}" || (shred kh key; exit 1)
         shred kh key

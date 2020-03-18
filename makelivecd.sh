@@ -84,10 +84,10 @@ finalize() {
     mkdir upload
     mv out/* upload/
     pushd upload
-        md5sum * > md5sum
-        sha1sum * > sha1sum
+        md5sum *.iso > md5sum
+        sha1sum *.iso > sha1sum
     popd
-    ver=(cat /version)
+    ver=$(cat /version)
     mkdir "upload/${ver}"
     cp -avT work/iso "upload/${ver}"
 }
