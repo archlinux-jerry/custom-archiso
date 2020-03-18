@@ -84,12 +84,19 @@ finalize() {
     mkdir upload
     mv out/* upload/
     pushd upload
-        md5sum *.iso > md5sum
-        sha1sum *.iso > sha1sum
+        md5sum *.iso > md5sums.txt
+        sha1sum *.iso > sha1sums.txt
     popd
     ver=$(cat /version)
     mkdir "upload/${ver}"
     cp -avT work/iso "upload/${ver}"
+    pushd upload
+        ln -s "${ver}" latest
+        mkdir archlinux
+    popd
+    pushd upload/archlinux
+        ln -s .. iso
+    popd
 }
 
 if [ -e '/etc/debian_version' ]; then

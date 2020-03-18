@@ -56,5 +56,5 @@ jobs:
         [ -n "$KNOWN_HOST" ] || (echo KNOWN_HOST is not set; exit 1)
         [ -n "$SSHPRIVKEY" ] || (echo SSHPRIVKEY is not set; exit 1)
         echo "Starting Upload      ..."
-        rsync --delete -rvPh -e "ssh -l ${RSYNC_HOST%@*} -i key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}" || (shred kh key; exit 1)
+        rsync --delete -rlvPh -e "ssh -l ${RSYNC_HOST%@*} -i key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}" || (shred kh key; exit 1)
         shred kh key
