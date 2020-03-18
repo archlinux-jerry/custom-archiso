@@ -24,6 +24,8 @@ arch-chroot() {
 makelivecd() {
     cd /
     echo 'Server = https://mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+    pacman-key --init
+    pacman-key --populate archlinux
     pacman --noconfirm -Syu archiso
     mkdir -p livecd
     cd livecd
