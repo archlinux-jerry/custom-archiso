@@ -18,7 +18,7 @@ arch-chroot() {
     cp -av $0 ./root.x86_64/$0
     cp -av version ./root.x86_64/version
     mount --bind root.x86_64 root.x86_64
-    ./root.x86_64/bin/arch-chroot ./root.x86_64 bash $0
+    ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
 }
 
 makelivecd() {
@@ -26,7 +26,7 @@ makelivecd() {
     echo 'Server = https://mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
     pacman-key --init
     pacman-key --populate archlinux
-    pacman --noconfirm --needed -Syu base base-devel archiso
+    pacman --noconfirm --needed -Syu base base-devel archiso python
     mkdir -p livecd
     cd livecd
     cp -r /usr/share/archiso/configs/releng/ archlive
@@ -35,7 +35,6 @@ makelivecd() {
 chsh -s /bin/bash root
 pacman --noconfirm -Rscn zsh
 passwd -d root
-sed -i 's/#\(PermitRootLogin \).\+/\1no/' /etc/ssh/sshd_config
 EOF
     cat << EOF > packages.x86_64
 arch-install-scripts
@@ -72,7 +71,6 @@ reiserfsprogs
 rp-pppoe
 sg3_utils
 sudo
-usb_modeswitch
 wget
 wvdial
 xfsprogs
