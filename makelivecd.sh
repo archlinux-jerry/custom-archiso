@@ -100,8 +100,13 @@ finalize() {
     cp -avT work/iso "upload/${realver}/"
     # makelink /archlinux/iso -> ../
     mkdir upload/archlinux
+    # generic archlinux mirror structure
     pushd upload/archlinux
         ln -s .. iso
+    popd
+    # mirror.pkgbuild.com structure
+    pushd upload
+        ln -s . iso
     popd
 }
 
