@@ -82,18 +82,26 @@ EOF
 }
 finalize() {
     mkdir upload
-    mv out/* upload/
+    pushd out
+        ls -alh || true
+        realver=$(ls -1 *.iso |python3 -c 'print(input().split("-")[2])')
+    popd
+    ver=$(cat /version)
+    mkdir "upload/${realver}"
     pushd upload
+        ln -s "$realver" "$ver"
+        ln -s "$realver" "latest"
+    popd
+    # move iso
+    mv out/*.iso "upload/${realver}/"
+    pushd "upload/${realver}"
         md5sum *.iso > md5sums.txt
         sha1sum *.iso > sha1sums.txt
     popd
-    ver=$(cat /version)
-    mkdir "upload/${ver}"
-    cp -avT work/iso "upload/${ver}"
-    pushd upload
-        ln -s "${ver}" latest
-        mkdir archlinux
-    popd
+    # copy netboot content
+    cp -avT work/iso "upload/${realver}/"
+    # makelink /archlinux/iso -> ../
+    mkdir upload/archlinux
     pushd upload/archlinux
         ln -s .. iso
     popd
