@@ -82,7 +82,7 @@ finalize() {
     mkdir upload
     pushd out
         ls -alh || true
-        realver=$(ls -1 *.iso |python3 -c 'print(input().split("-")[2])')
+        realver=$(ls -1 *.iso |python3 -c 'print(input().split("-")[1])')
     popd
     ver=$(cat /version)
     mkdir "upload/${realver}"
