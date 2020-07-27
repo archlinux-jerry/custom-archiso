@@ -2,7 +2,7 @@
 set -ex
 
 configure_archbootstrap() {
-    MIRROR="https://jpn.mirror.pkgbuild.com"
+    MIRROR="https://pkgbuild.meson.cc"
     ISO_DIR="iso/latest"
     MD5SUM="${MIRROR}/${ISO_DIR}/md5sums.txt"
     curl -o md5sum "$MD5SUM"
@@ -23,7 +23,7 @@ arch-chroot() {
 
 makelivecd() {
     cd /
-    echo 'Server = https://mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+    echo 'Server = https://pkgbuild.meson.cc/$repo/os/$arch' > /etc/pacman.d/mirrorlist
     pacman-key --init
     pacman-key --populate archlinux
     pacman --noconfirm --needed -Syu base base-devel archiso python
