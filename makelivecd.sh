@@ -33,49 +33,69 @@ makelivecd() {
     cd archlive
     cat << EOF >> airootfs/root/customize_airootfs.sh
 chsh -s /bin/bash root
-pacman --noconfirm -Rscn zsh
 passwd -d root
 EOF
-    cat << EOF > packages.x86_64
-arch-install-scripts
-btrfs-progs
-dhcpcd
-diffutils
-dmraid
-dnsmasq
-dnsutils
-dosfstools
-elinks
-ethtool
-exfat-utils
-f2fs-tools
-gnu-netcat
-gpm
-gptfdisk
-jfsutils
-linux-atm
-lsscsi
-lvm2
-mdadm
-mtools
+    cat << EOF >> packages.x86_64
 nano
-ndisc6
-netctl
-nfs-utils
-nilfs-utils
-ntfs-3g
-ntp
-openssh
-ppp
-reiserfsprogs
-rp-pppoe
-sg3_utils
-sudo
-wget
-wvdial
-xfsprogs
-linux
 EOF
+    cat << EOF > packages.x86_64.remove
+b43-fwcutter
+bind-tools
+broadcom-wl
+clonezilla
+crda
+darkhttpd
+ddrescue
+dhclient
+edk2-shell
+efibootmgr
+fsarchiver
+grml-zsh-config
+haveged
+hdparm
+ipw2100-fw
+ipw2200-fw
+iwd
+kitty-terminfo
+lftp
+linux-firmware
+lynx
+man-db
+man-pages
+mc
+memtest86+
+ndisc6
+nmap
+nvme-cli
+openconnect
+openvpn
+partclone
+parted
+partimage
+pptpclient
+reflector
+rsync
+rxvt-unicode-terminfo
+sdparm
+sg3_utils
+smartmontools
+systemd-resolvconf
+tcpdump
+terminus-font
+termite-terminfo
+testdisk
+usb_modeswitch
+usbutils
+vim
+vpnc
+wireless-regdb
+wireless_tools
+wpa_supplicant
+xl2tpd
+zsh
+EOF
+    cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
+    mv -f packages.x86_64.final packages.x86_64
     ./build.sh -v
 }
 finalize() {
