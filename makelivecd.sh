@@ -45,6 +45,7 @@ makelivecd() {
     cat << EOF >> airootfs/root/customize_airootfs.sh
 chsh -s /bin/bash root
 passwd -d root
+rm -f /etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
 EOF
     cat << EOF >> packages.x86_64
 nano
