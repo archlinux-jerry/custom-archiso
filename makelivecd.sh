@@ -34,14 +34,14 @@ makelivecd() {
     cp build.sh build.sh.1
     sed -i 's/^\(.*shellx64\.efi.*\)$/#\1/g' build.sh # drop efi shell
     sed -i 's/^\(.*ucode\.img.*EFI.*\)$/#\1/g' build.sh # drop ucode
-    diff build.sh.1 build.sh
+    diff build.sh.1 build.sh || true
     # drop ucode from loader
     cp -a efiboot/loader/entries efiboot/loader/entries.1
     sed -i '/ucode\.img/d' entries/*.conf
-    diff -r efiboot/loader/entries.1 efiboot/loader/entries
+    diff -r efiboot/loader/entries.1 efiboot/loader/entries || true
     cp -a syslinux syslinux.1
     sed -i 's/^INITRD boot\/intel-ucode.img,boot\/amd-ucode.img,boot\/x86_64\/archiso.img$/INITRD boot\/x86_64\/archiso.img' syslinux/*.cfg
-    diff -r syslinux.1 syslinux
+    diff -r syslinux.1 syslinux || true
     cat << EOF >> airootfs/root/customize_airootfs.sh
 chsh -s /bin/bash root
 passwd -d root
