@@ -31,7 +31,17 @@ makelivecd() {
     cd livecd
     cp -r /usr/share/archiso/configs/releng/ archlive
     cd archlive
-    sed -i 's/^\(.*shellx64\.efi.*\)$/#\1/g' build.sh # just do not need that efi shell
+    cp build.sh build.sh.1
+    sed -i 's/^\(.*shellx64\.efi.*\)$/#\1/g' build.sh # drop efi shell
+    sed -i 's/^\(.*ucode\.img.*EFI.*\)$/#\1/g' build.sh # drop ucode
+    diff build.sh.1 build.sh
+    # drop ucode from loader
+    cp -a efiboot/loader/entries efiboot/loader/entries.1
+    sed -i '/ucode\.img/d' entries/*.conf
+    diff -r efiboot/loader/entries.1 efiboot/loader/entries
+    cp -a syslinux syslinux.1
+    sed -i 's/^INITRD boot\/intel-ucode.img,boot\/amd-ucode.img,boot\/x86_64\/archiso.img$/INITRD boot\/x86_64\/archiso.img' syslinux/*.cfg
+    diff -r syslinux.1 syslinux
     cat << EOF >> airootfs/root/customize_airootfs.sh
 chsh -s /bin/bash root
 passwd -d root
@@ -94,6 +104,8 @@ wireless_tools
 wpa_supplicant
 xl2tpd
 zsh
+amd-ucode
+intel-ucode
 EOF
     cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
