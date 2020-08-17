@@ -49,6 +49,7 @@ rm -f /etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
 EOF
     cat << EOF >> packages.x86_64
 nano
+bash-completion
 EOF
     cat << EOF > packages.x86_64.remove
 b43-fwcutter
