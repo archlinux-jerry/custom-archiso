@@ -31,7 +31,7 @@ makelivecd() {
     cd livecd
     cp -r /usr/share/archiso/configs/releng/ archlive
     cd archlive
-    sed -i 's/^\(.*edk2-shell.*\)$/#\1/g' build.sh # just do not need that efi shell
+    sed -i 's/^\(.*shellx64\.efi.*\)$/#\1/g' build.sh # just do not need that efi shell
     cat << EOF >> airootfs/root/customize_airootfs.sh
 chsh -s /bin/bash root
 passwd -d root
