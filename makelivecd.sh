@@ -34,7 +34,7 @@ makelivecd() {
     cd releng
     # drop ucode from loader
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
-    sed -i 's/^INITRD .+$/INITRD boot\/x86_64\/initramfs-linux.img/g' syslinux/*.cfg
+    sed -i 's|^INITRD .*$|INITRD boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # not using customize_airootfs.sh
     # chsh -s /bin/bash root
     # passwd -d root
