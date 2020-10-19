@@ -29,24 +29,24 @@ makelivecd() {
     pacman --noconfirm --needed -Syu base base-devel archiso python
     mkdir -p livecd
     cd livecd
-    cp -r /usr/share/archiso/configs/releng/ archlive
-    cd archlive
-    cp build.sh build.sh.1
-    sed -i 's/^\(.*shellx64\.efi.*\)$/#\1/g' build.sh # drop efi shell
-    sed -i 's/^\(.*ucode\.img.*EFI.*\)$/#\1/g' build.sh # drop ucode
-    diff build.sh.1 build.sh || true
+    cp -r /usr/share/archiso/configs/releng releng
+    cp -r /usr/share/archiso/configs/releng releng.1
+    cd releng
     # drop ucode from loader
-    cp -a efiboot/loader/entries efiboot/loader/entries.1
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
-    diff -r efiboot/loader/entries.1 efiboot/loader/entries || true
-    cp -a syslinux syslinux.1
-    sed -i 's/^INITRD boot\/intel-ucode.img,boot\/amd-ucode.img,boot\/x86_64\/archiso.img$/INITRD boot\/x86_64\/archiso.img/g' syslinux/*.cfg
-    diff -r syslinux.1 syslinux || true
-    cat << EOF >> airootfs/root/customize_airootfs.sh
-chsh -s /bin/bash root
-passwd -d root
-rm -f /etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
-EOF
+    sed -i 's/^INITRD .+$/INITRD boot\/x86_64\/initramfs-linux.img/g' syslinux/*.cfg
+    # not using customize_airootfs.sh
+    # chsh -s /bin/bash root
+    # passwd -d root
+    # rm -f /etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
+    # instead
+    {
+        sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
+        [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
+        rm -f airootfs/etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
+    }
+    # alter packages
+    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/951b2178131ff64c01c35529f718773a9fa058bb/configs/releng/packages.x86_64
     cat << EOF >> packages.x86_64
 nano
 bash-completion
@@ -111,7 +111,19 @@ intel-ucode
 EOF
     cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
-    ./build.sh -v
+    rm packages.x86_64.remove
+    # print diff
+    {
+        pushd ..
+        echo -e "\n\n"
+        echo -e "-------------------------"
+        echo -e "-------------------------"
+        diff -r releng.1 releng || true
+        echo -e "-------------------------"
+        echo -e "-------------------------"
+        echo -e "\n\n"
+    }
+    mkarchiso -v .
 }
 finalize() {
     mkdir upload
