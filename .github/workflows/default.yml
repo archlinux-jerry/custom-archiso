@@ -44,7 +44,7 @@ jobs:
       run: |
         sudo apt update -qq
         sudo apt install -y tree rsync openssh-client
-        cd root.x86_64/livecd/archlive
+        cd root.x86_64/livecd/releng
         sudo chown -R $UID upload
         sudo chown $UID .
         tree -a upload || true
