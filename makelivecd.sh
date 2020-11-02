@@ -32,21 +32,19 @@ makelivecd() {
     cp -r /usr/share/archiso/configs/releng releng
     cp -r /usr/share/archiso/configs/releng releng.1
     cd releng
+    # drop speech from sdboot, just forget about syslinux
+    rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
     # drop ucode from loader
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
     sed -i 's|^INITRD .*$|INITRD boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # not using customize_airootfs.sh
-    # chsh -s /bin/bash root
-    # passwd -d root
-    # rm -f /etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
-    # instead
     {
         sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
         [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
         rm -f airootfs/etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
     }
     # alter packages
-    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/951b2178131ff64c01c35529f718773a9fa058bb/configs/releng/packages.x86_64
+    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/cc169d7e31edc3bf2b4463c01dde6af008e52a51/configs/releng/packages.x86_64
     cat << EOF >> packages.x86_64
 nano
 bash-completion
@@ -108,11 +106,21 @@ xl2tpd
 zsh
 amd-ucode
 intel-ucode
+alsa-utils
+brltty
+espeakup
+fatresize
+gpart
+livecd-sounds
+squashfs-tools
+tmux
+udftools
 EOF
     cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
     rm packages.x86_64.remove
     # print diff
+    sleep 1 # github ci mixes stdout
     {
         pushd ..
         echo -e "\n\n"
