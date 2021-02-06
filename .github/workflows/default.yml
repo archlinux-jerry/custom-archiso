@@ -66,12 +66,12 @@ jobs:
         echo "IdentityFile $(realpath key)" > ~/.ssh/config
         ssh -o StrictHostKeyChecking=no git@github.com -T
         mkdir keepalive
-        cd keepalive
+        pushd keepalive
         git init .
         git config user.name "githubsucksbot"
         git config user.email "bot@github.com"
         git remote add g git@github.com:archlinux-jerry/archlive-ultralite.git
         git commit --allow-empty -m 'github sucks'
-        git push -q -f -u g github-sucks
-        } || (shred kh key; exit 1)
-        shred kh key
+        git push -q -f -u g master:github-sucks
+        } || (popd || true; shred kh key; exit 1)
+        popd || true; shred kh key
