@@ -41,10 +41,10 @@ makelivecd() {
     {
         sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
         [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
-        rm -f airootfs/etc/systemd/system/multi-user.target.wants/{iwd,reflector}.service
+        find airootfs/etc/systemd/system -xtype l -delete -print
     }
     # alter packages
-    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/cc169d7e31edc3bf2b4463c01dde6af008e52a51/configs/releng/packages.x86_64
+    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/9b03e0b08aa26b762bad770751f49ac520016965/configs/releng/packages.x86_64
     cat << EOF >> packages.x86_64
 nano
 bash-completion
@@ -115,6 +115,7 @@ livecd-sounds
 squashfs-tools
 tmux
 udftools
+cloud-init
 EOF
     cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
