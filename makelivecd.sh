@@ -22,7 +22,7 @@ arch-chroot() {
 }
 
 remove_dead_link() {
-python - airootfs/etc/systemd/system airootfs << EOF
+python - $@ << EOF
 from pathlib import Path
 from sys import argv
 for f in Path(argv[-2]).rglob('*'):
@@ -57,7 +57,7 @@ makelivecd() {
     {
         sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
         [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
-        remove_dead_link
+        remove_dead_link airootfs/etc/systemd/system airootfs
     }
     # alter packages
     # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/9b03e0b08aa26b762bad770751f49ac520016965/configs/releng/packages.x86_64
@@ -138,16 +138,9 @@ EOF
     mv -f packages.x86_64.final packages.x86_64
     rm packages.x86_64.remove packages.x86_64.dedup
     # print diff
-    sleep 1 # github ci mixes stdout
     {
         pushd ..
-        echo -e "\n\n"
-        echo -e "-------------------------"
-        echo -e "-------------------------"
         diff -r releng.1 releng || true
-        echo -e "-------------------------"
-        echo -e "-------------------------"
-        echo -e "\n\n"
         popd
     }
     mkarchiso -v .
@@ -171,7 +164,7 @@ finalize() {
         sha1sum *.iso > sha1sums.txt
     popd
     # copy netboot content
-    cp -avT work/iso "upload/${realver}/"
+    cp -av work/iso/arch "upload/${realver}/"
     # makelink /archlinux/iso -> ../
     mkdir upload/archlinux
     # generic archlinux mirror structure
