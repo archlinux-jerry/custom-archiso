@@ -21,6 +21,22 @@ arch-chroot() {
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
 }
 
+remove_dead_link() {
+python - airootfs/etc/systemd/system airootfs << EOF
+from pathlib import Path
+from sys import argv
+for f in Path(argv[-2]).rglob('*'):
+    if f.is_symlink():
+        if f.resolve().exists():
+            pass
+        elif (Path(argv[-1]).resolve() / (f.resolve().relative_to('/'))).exists():
+            pass
+        else:
+            print('rm', str(f))
+            f.unlink()
+EOF
+}
+
 makelivecd() {
     cd /
     echo 'Server = https://pkgbuild.meson.cc/$repo/os/$arch' > /etc/pacman.d/mirrorlist
@@ -41,7 +57,7 @@ makelivecd() {
     {
         sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
         [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
-        find airootfs/etc/systemd/system -xtype l -delete -print
+        remove_dead_link
     }
     # alter packages
     # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/9b03e0b08aa26b762bad770751f49ac520016965/configs/releng/packages.x86_64
