@@ -133,9 +133,10 @@ tmux
 udftools
 cloud-init
 EOF
-    cat packages.x86_64 packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
+    cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
+    cat packages.x86_64.dedup packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
-    rm packages.x86_64.remove
+    rm packages.x86_64.remove packages.x86_64.dedup
     # print diff
     sleep 1 # github ci mixes stdout
     {
