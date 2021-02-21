@@ -52,7 +52,7 @@ makelivecd() {
     rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
     # drop ucode from loader
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
-    sed -i 's|^INITRD .*$|INITRD boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
+    sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # not using customize_airootfs.sh
     {
         sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
