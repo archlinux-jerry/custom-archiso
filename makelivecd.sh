@@ -60,7 +60,7 @@ makelivecd() {
         remove_dead_link airootfs/etc/systemd/system airootfs
     }
     # alter packages
-    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/9b03e0b08aa26b762bad770751f49ac520016965/configs/releng/packages.x86_64
+    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/e43017c955ab9e3d6394098e49fe588bd848d3e2/configs/releng/packages.x86_64
     cat << EOF >> packages.x86_64
 nano
 bash-completion
@@ -78,7 +78,6 @@ edk2-shell
 efibootmgr
 fsarchiver
 grml-zsh-config
-haveged
 hdparm
 ipw2100-fw
 ipw2200-fw
@@ -132,6 +131,8 @@ squashfs-tools
 tmux
 udftools
 cloud-init
+usbmuxd
+sof-firmware
 EOF
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
     cat packages.x86_64.dedup packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
