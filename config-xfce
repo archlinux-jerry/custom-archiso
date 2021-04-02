@@ -14,6 +14,7 @@ Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "systemctl enable NetworkManager lightdm && \
 systemctl disable iwd reflector systemd-networkd systemd-resolved && \
+systemctl set-default graphical.target && \
 sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config && \
 groupadd -r autologin && \
 useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
