@@ -1,0 +1,64 @@
+pre_build() {
+
+    # no customize_airootfs.sh? no problem
+    mkdir -p airootfs/etc/pacman.d/hooks
+    cat << EOF > airootfs/etc/pacman.d/hooks/99-customize-airootfs.hook
+# remove from airootfs!
+[Trigger]
+Operation = Install
+Type = Package
+Target = networkmanager
+
+[Action]
+Description = Running customize-airootfs...
+When = PostTransaction
+Exec = /bin/sh -c "systemctl enable NetworkManager lightdm && \
+systemctl disable iwd reflector systemd-networkd systemd-resolved && \
+sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config && \
+groupadd -r autologin && \
+useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
+echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+echo -e "archiso\narchiso" | passwd archiso && \
+passwd -d root && \
+rm -fv /etc/lightdm/lightdm.conf.pacnew"
+EOF
+
+    # lightdm.conf
+    mkdir -p airootfs/etc/lightdm
+    cat << EOF > airootfs/etc/lightdm/lightdm.conf
+[LightDM]
+run-directory=/run/lightdm
+[Seat:*]
+session-wrapper=/etc/lightdm/Xsession
+autologin-user=archiso
+autologin-user-timeout=1
+EOF
+
+    # pkglist check
+    compatver=v52
+    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
+    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
+    curl -L -o packages.x86_64.compat "$compatraw"
+    diff packages.x86_64 packages.x86_64.compat
+
+    # alter packages
+    cat << EOF >> packages.x86_64
+nano
+bash-completion
+xorg-server
+nvidia
+mesa
+virtualbox-guest-utils
+xfce4
+lightdm
+lightdm-gtk-greeter
+networkmanager
+network-manager-applet
+nm-connection-editor
+firefox
+gparted
+EOF
+    cat << EOF > packages.x86_64.remove
+EOF
+
+}

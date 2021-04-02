@@ -19,6 +19,12 @@ jobs:
     # The type of runner that the job will run on
     if: "github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        LIVECD_PROFILE:
+        - ultralite
+        - xfce
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,12 +36,15 @@ jobs:
     # Runs a single command using the runners shell
     - name: Run makelivecd script
       shell: bash
-      run: sudo bash makelivecd.sh
+      env:
+        LIVECD_PROFILE: ${{ matrix.LIVECD_PROFILE }}
+      run: sudo LIVECD_PROFILE="$LIVECD_PROFILE" bash makelivecd.sh
 
     # Runs a set of commands using the runners shell
     # upload files
     - name: Upload files
       env:
+        LIVECD_PROFILE: ${{ matrix.LIVECD_PROFILE }}
         RSYNC_HOST: ${{ secrets.HOST }}
         RSYNC_PATH: ${{ secrets.PATH }}
         KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
@@ -49,21 +58,21 @@ jobs:
         sudo chown $UID .
         tree -a upload || true
         echo "Setting up KNOWN_HOST..."
-        echo "$KNOWN_HOST" > kh
+        echo "$KNOWN_HOST" > ~/kh
         echo "Setting up PRIV_KEY  ..."
         trap "shred -v ~/key ~/kh" ERR EXIT
-        echo "$SSHPRIVKEY" |base64 -d > key
-        chmod 0600 key
+        echo "$SSHPRIVKEY" |base64 -d > ~/key
+        chmod 0600 ~/key
         echo "ASSERTING            ..."
         [ -n "$RSYNC_HOST" ] || (echo RSYNC_HOST is not set; exit 1)
         [ -n "$RSYNC_PATH" ] || (echo RSYNC_PATH is not set; exit 1)
         [ -n "$KNOWN_HOST" ] || (echo KNOWN_HOST is not set; exit 1)
         [ -n "$SSHPRIVKEY" ] || (echo SSHPRIVKEY is not set; exit 1)
         echo "Starting Upload      ..."
-        rsync --delete -rlvPh -e "ssh -l ${RSYNC_HOST%@*} -i key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}"
+        rsync --delete -rlvPh -e "ssh -l ${RSYNC_HOST%@*} -i ~/key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=~/kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}/${LIVECD_PROFILE}"
         echo "Starting KeepAlive   ..."
         mkdir -p ~/.ssh
-        echo "IdentityFile $(realpath key)" > ~/.ssh/config
+        echo "IdentityFile $(realpath ~/key)" > ~/.ssh/config
         ssh -o StrictHostKeyChecking=no git@github.com -T
         mkdir keepalive
         pushd keepalive

@@ -48,102 +48,10 @@ makelivecd() {
     cp -r /usr/share/archiso/configs/releng releng
     cp -r /usr/share/archiso/configs/releng releng.1
     cd releng
-    # drop speech from sdboot, just forget about syslinux
-    rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
-    # drop ucode from loader
-    sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
-    sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
-    # not using customize_airootfs.sh
-    {
-        sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
-        [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
-        remove_dead_link airootfs/etc/systemd/system airootfs
-    }
 
-    # pkglist check
-    compatver=v52
-    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
-    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
-    curl -L -o packages.x86_64.compat "$compatraw"
-    diff packages.x86_64 packages.x86_64.compat
+    source "config-${LIVECD_PROFILE}"
+    pre_build
 
-    # alter packages
-    cat << EOF >> packages.x86_64
-nano
-bash-completion
-EOF
-    cat << EOF > packages.x86_64.remove
-b43-fwcutter
-bind-tools
-broadcom-wl
-clonezilla
-crda
-darkhttpd
-ddrescue
-dhclient
-edk2-shell
-efibootmgr
-fsarchiver
-grml-zsh-config
-hdparm
-ipw2100-fw
-ipw2200-fw
-iwd
-kitty-terminfo
-lftp
-linux-firmware
-lynx
-man-db
-man-pages
-mc
-memtest86+
-ndisc6
-nmap
-nvme-cli
-openconnect
-openvpn
-partclone
-parted
-partimage
-pptpclient
-reflector
-rsync
-rxvt-unicode-terminfo
-sdparm
-sg3_utils
-smartmontools
-systemd-resolvconf
-tcpdump
-terminus-font
-termite-terminfo
-testdisk
-usb_modeswitch
-usbutils
-vim
-vpnc
-wireless-regdb
-wireless_tools
-wpa_supplicant
-xl2tpd
-zsh
-amd-ucode
-intel-ucode
-alsa-utils
-brltty
-espeakup
-fatresize
-gpart
-livecd-sounds
-squashfs-tools
-tmux
-udftools
-cloud-init
-usbmuxd
-sof-firmware
-modemmanager
-archinstall
-sl
-EOF
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
     cat packages.x86_64.dedup packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
     mv -f packages.x86_64.final packages.x86_64
