@@ -23,6 +23,7 @@ echo -e 'archiso\narchiso' | passwd archiso && \
 passwd -d root && \
 rm -fv /etc/lightdm/lightdm.conf.pacnew && \
 rm -fv /etc/resolv.conf && \
+touch /etc/resolv.conf && \
 true"
 EOF
 
