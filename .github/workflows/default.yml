@@ -51,6 +51,7 @@ jobs:
         echo "Setting up KNOWN_HOST..."
         echo "$KNOWN_HOST" > kh
         echo "Setting up PRIV_KEY  ..."
+        trap "shred -v ~/key ~/kh" ERR EXIT
         echo "$SSHPRIVKEY" |base64 -d > key
         chmod 0600 key
         echo "ASSERTING            ..."
@@ -58,7 +59,6 @@ jobs:
         [ -n "$RSYNC_PATH" ] || (echo RSYNC_PATH is not set; exit 1)
         [ -n "$KNOWN_HOST" ] || (echo KNOWN_HOST is not set; exit 1)
         [ -n "$SSHPRIVKEY" ] || (echo SSHPRIVKEY is not set; exit 1)
-        {
         echo "Starting Upload      ..."
         rsync --delete -rlvPh -e "ssh -l ${RSYNC_HOST%@*} -i key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}"
         echo "Starting KeepAlive   ..."
@@ -73,5 +73,4 @@ jobs:
         git remote add g git@github.com:archlinux-jerry/archlive-ultralite.git
         git commit --allow-empty -m 'github sucks'
         git push -q -f -u g master:github-sucks
-        } || (popd || true; shred kh key; exit 1)
-        popd || true; shred kh key
+        popd
