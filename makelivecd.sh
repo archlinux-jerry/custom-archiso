@@ -49,7 +49,7 @@ makelivecd() {
     cp -r /usr/share/archiso/configs/releng releng.1
     cd releng
 
-    source "config-${LIVECD_PROFILE}"
+    source "../../config-${LIVECD_PROFILE}"
     pre_build
 
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
