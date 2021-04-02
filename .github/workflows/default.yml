@@ -73,7 +73,7 @@ jobs:
         echo "Starting KeepAlive   ..."
         mkdir -p ~/.ssh
         echo "IdentityFile $(realpath ~/key)" > ~/.ssh/config
-        ssh -o StrictHostKeyChecking=no git@github.com -T
+        ssh -o StrictHostKeyChecking=no git@github.com -T || true
         mkdir keepalive
         pushd keepalive
         git init .
