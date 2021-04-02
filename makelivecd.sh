@@ -16,6 +16,7 @@ configure_archbootstrap() {
 }
 arch-chroot() {
     cp -av $0 ./root.x86_64/$0
+    cp -av "config-${LIVECD_PROFILE}" ./root.x86_64/"config-${LIVECD_PROFILE}"
     cp -av version ./root.x86_64/version
     mount --bind root.x86_64 root.x86_64
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
@@ -49,7 +50,7 @@ makelivecd() {
     cp -r /usr/share/archiso/configs/releng releng.1
     cd releng
 
-    source "../../config-${LIVECD_PROFILE}"
+    source "/config-${LIVECD_PROFILE}"
     pre_build
 
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
