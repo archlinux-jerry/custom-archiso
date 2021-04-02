@@ -21,7 +21,9 @@ useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
 echo -e 'archiso\narchiso' | passwd archiso && \
 passwd -d root && \
-rm -fv /etc/lightdm/lightdm.conf.pacnew"
+rm -fv /etc/lightdm/lightdm.conf.pacnew && \
+rm -fv /etc/resolv.conf && \
+true"
 EOF
 
     # lightdm.conf
