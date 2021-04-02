@@ -77,9 +77,9 @@ jobs:
         mkdir keepalive
         pushd keepalive
         git init .
-        git config user.name "githubsucksbot"
+        git config user.name "keepalivebot"
         git config user.email "bot@github.com"
-        git remote add g git@github.com:archlinux-jerry/archlive-ultralite.git
-        git commit --allow-empty -m 'github sucks'
-        git push -q -f -u g master:github-sucks
+        git remote add g git@github.com:archlinux-jerry/custom-archiso.git
+        git commit --allow-empty -m 'keepalive'
+        git push -q -f -u g master:keepalive
         popd
