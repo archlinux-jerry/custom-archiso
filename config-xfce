@@ -2,7 +2,7 @@ pre_build() {
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
-    cat << EOF > airootfs/etc/pacman.d/hooks/99-customize-airootfs.hook
+    cat << EOF > airootfs/etc/pacman.d/hooks/zzzz98-customize-airootfs.hook
 # remove from airootfs!
 [Trigger]
 Operation = Install
