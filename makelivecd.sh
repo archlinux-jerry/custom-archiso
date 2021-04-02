@@ -59,8 +59,15 @@ makelivecd() {
         [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
         remove_dead_link airootfs/etc/systemd/system airootfs
     }
+
+    # pkglist check
+    compatver=v52
+    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
+    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
+    curl -L -o packages.x86_64.compat "$compatraw"
+    diff packages.x86_64 packages.x86_64.compat
+
     # alter packages
-    # compat: https://gitlab.archlinux.org/archlinux/archiso/-/blob/e43017c955ab9e3d6394098e49fe588bd848d3e2/configs/releng/packages.x86_64
     cat << EOF >> packages.x86_64
 nano
 bash-completion
@@ -133,6 +140,9 @@ udftools
 cloud-init
 usbmuxd
 sof-firmware
+modemmanager
+archinstall
+sl
 EOF
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
     cat packages.x86_64.dedup packages.x86_64.remove packages.x86_64.remove |sort |uniq -u > packages.x86_64.final
