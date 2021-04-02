@@ -22,22 +22,6 @@ arch-chroot() {
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
 }
 
-remove_dead_link() {
-python - $@ << EOF
-from pathlib import Path
-from sys import argv
-for f in Path(argv[-2]).rglob('*'):
-    if f.is_symlink():
-        if f.resolve().exists():
-            pass
-        elif (Path(argv[-1]).resolve() / (f.resolve().relative_to('/'))).exists():
-            pass
-        else:
-            print('rm', str(f))
-            f.unlink()
-EOF
-}
-
 makelivecd() {
     cd /
     echo 'Server = https://pkgbuild.meson.cc/$repo/os/$arch' > /etc/pacman.d/mirrorlist

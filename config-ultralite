@@ -5,12 +5,23 @@ pre_build() {
     # drop ucode from loader
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
     sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
-    # not using customize_airootfs.sh
-    {
-        sed -i 's|/usr/bin/zsh|/bin/bash|g' airootfs/etc/passwd
-        [ "$(cat airootfs/etc/shadow)" == 'root::14871::::::' ]
-        remove_dead_link airootfs/etc/systemd/system airootfs
-    }
+
+    # no customize_airootfs.sh? no problem
+    mkdir -p airootfs/etc/pacman.d/hooks
+    cat << EOF > airootfs/etc/pacman.d/hooks/zzzz98-customize-airootfs.hook
+# remove from airootfs!
+[Trigger]
+Operation = Install
+Type = Package
+Target = bash-completion
+
+[Action]
+Description = Running customize-airootfs...
+When = PostTransaction
+Exec = /bin/sh -c "chsh -s /bin/bash root && \
+passwd -d root && \
+find /etc/systemd/system -xtype l -delete -print"
+EOF
 
     # pkglist check
     compatver=v52
