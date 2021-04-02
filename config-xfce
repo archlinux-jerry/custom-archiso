@@ -18,7 +18,7 @@ sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config 
 groupadd -r autologin && \
 useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
-echo -e "archiso\narchiso" | passwd archiso && \
+echo -e 'archiso\narchiso' | passwd archiso && \
 passwd -d root && \
 rm -fv /etc/lightdm/lightdm.conf.pacnew"
 EOF
