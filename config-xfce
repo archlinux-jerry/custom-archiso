@@ -36,6 +36,7 @@ run-directory=/run/lightdm
 session-wrapper=/etc/lightdm/Xsession
 autologin-user=archiso
 autologin-user-timeout=1
+autologin-session=xfce
 EOF
 
     # pkglist check
