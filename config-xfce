@@ -13,7 +13,7 @@ Target = networkmanager
 Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "systemctl enable NetworkManager lightdm && \
-systemctl disable iwd reflector systemd-networkd systemd-resolved && \
+systemctl disable sshd iwd reflector systemd-networkd systemd-resolved && \
 systemctl set-default graphical.target && \
 sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config && \
 groupadd -r autologin && \

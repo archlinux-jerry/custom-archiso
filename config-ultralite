@@ -19,6 +19,7 @@ Target = bash-completion
 Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "chsh -s /bin/bash root && \
+systemctl disable sshd && \
 passwd -d root && \
 find /etc/systemd/system -xtype l -delete -print"
 EOF
