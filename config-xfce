@@ -45,6 +45,7 @@ EOF
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
     diff packages.x86_64 packages.x86_64.compat
+    rm packages.x86_64.compat
 
     # alter packages
     cat << EOF >> packages.x86_64
