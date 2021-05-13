@@ -25,7 +25,7 @@ find /etc/systemd/system -xtype l -delete -print"
 EOF
 
     # pkglist check
-    compatver=v52
+    compatver=v53
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
@@ -106,7 +106,10 @@ usbmuxd
 sof-firmware
 modemmanager
 archinstall
-sl
+libusb-compat
+pcsclite
+libfido2
+tpm2-tss
 EOF
 
 }
