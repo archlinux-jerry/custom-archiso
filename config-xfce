@@ -65,6 +65,7 @@ firefox
 gparted
 EOF
     cat << EOF > packages.x86_64.remove
+virtualbox-guest-utils-nox
 EOF
 
 }
