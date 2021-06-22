@@ -1,5 +1,10 @@
 pre_build() {
 
+    # add custom/rootoverlay to airootfs
+    cp -rvT /custom/rootoverlay airootfs
+    # add archiso_pxe_dns to mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
+
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
     cat << EOF > airootfs/etc/pacman.d/hooks/zzzz98-customize-airootfs.hook

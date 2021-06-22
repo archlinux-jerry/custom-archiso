@@ -1,0 +1,8 @@
+#!/bin/ash
+
+run_hook () {
+    if [ -n "${archiso_dns}" ]; then
+        echo "# added by archiso_pxe_dns hook" > /etc/resolv.conf
+        echo "nameserver ${archiso_dns}" >> /etc/resolv.conf
+    fi
+}

@@ -18,6 +18,7 @@ arch-chroot() {
     cp -av $0 ./root.x86_64/$0
     cp -av "config-${LIVECD_PROFILE}" ./root.x86_64/"config-${LIVECD_PROFILE}"
     cp -av version ./root.x86_64/version
+    cp -av custom ./root.x86_64/custom
     mount --bind root.x86_64 root.x86_64
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
 }

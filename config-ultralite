@@ -1,5 +1,8 @@
 pre_build() {
 
+    # add custom/rootoverlay to airootfs
+    cp -rvT /custom/rootoverlay airootfs
+
     # drop speech from sdboot, just forget about syslinux
     rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
     # drop ucode from loader
@@ -7,6 +10,8 @@ pre_build() {
     sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # drop archiso_kms from mkinitcpio.conf
     sed -i 's/archiso_kms //g' airootfs/etc/mkinitcpio.conf
+    # add archiso_pxe_dns to mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
