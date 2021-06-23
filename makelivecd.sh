@@ -29,6 +29,10 @@ makelivecd() {
     pacman-key --init
     pacman-key --populate archlinux
     pacman --noconfirm --needed -Syu base base-devel archiso python
+
+    # make sure patches apply
+    /custom/patches/archiso.hook/patch.sh
+
     mkdir -p livecd
     cd livecd
     cp -r /usr/share/archiso/configs/releng releng
