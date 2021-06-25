@@ -34,7 +34,7 @@ makelivecd() {
     pacman --noconfirm --needed -Syu base base-devel archiso python
 
     # make sure patches apply
-    /custom/patches/archiso.hook/patch.sh
+    /custom/patches/archiso_pxe_http.hook/patch.sh
 
     mkdir -p livecd
     cd livecd
