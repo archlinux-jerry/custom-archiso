@@ -1,8 +1,10 @@
 #!/bin/bash
 set -ex
 
+MIRROR="${ARCH_MIRROR:-https://mirror.pkgbuild.com}"
+echo "using mirror ${MIRROR}"
+
 configure_archbootstrap() {
-    MIRROR="https://mirror.pkgbuild.com"
     ISO_DIR="iso/latest"
     MD5SUM="${MIRROR}/${ISO_DIR}/md5sums.txt"
     curl -o md5sum "$MD5SUM"
@@ -21,11 +23,12 @@ arch-chroot() {
     cp -av custom ./root.x86_64/custom
     mount --bind root.x86_64 root.x86_64
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
+    umount root.x86_64
 }
 
 makelivecd() {
     cd /
-    echo 'Server = https://mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+    echo 'Server = '"$MIRROR"'/$repo/os/$arch' > /etc/pacman.d/mirrorlist
     pacman-key --init
     pacman-key --populate archlinux
     pacman --noconfirm --needed -Syu base base-devel archiso python
@@ -87,13 +90,11 @@ finalize() {
     popd
 }
 
-if [ -e '/etc/debian_version' ]; then
-    configure_archbootstrap
-    arch-chroot
-elif [ -e '/etc/arch-release' ]; then
+if [ -e '/makelivecd.sh' ]; then
     makelivecd
     finalize
 else
-    exit 1
+    configure_archbootstrap
+    arch-chroot
 fi
 exit 0
