@@ -2,7 +2,9 @@
 set -ex
 
 MIRROR="${ARCH_MIRROR:-https://mirror.pkgbuild.com}"
+LIVECD_PROFILE="${LIVECD_PROFILE:-ultralite}"
 echo "using mirror ${MIRROR}"
+echo "using profile ${LIVECD_PROFILE}"
 
 configure_archbootstrap() {
     ISO_DIR="iso/latest"
@@ -23,7 +25,7 @@ arch-chroot() {
     cp -av custom ./root.x86_64/custom
     mount --bind root.x86_64 root.x86_64
     ./root.x86_64/bin/arch-chroot ./root.x86_64 bash "/${0}"
-    umount root.x86_64
+    umount root.x86_64 || true
 }
 
 makelivecd() {
