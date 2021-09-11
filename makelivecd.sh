@@ -1,9 +1,10 @@
 #!/bin/bash
 set -ex
 
-MIRROR="${ARCH_MIRROR:-https://mirror.pkgbuild.com}"
-LIVECD_PROFILE="${LIVECD_PROFILE:-ultralite}"
-echo "using mirror ${MIRROR}"
+export MIRROR="${MIRROR:-https://mirror.pkgbuild.com}"
+export MIRROR_DUP="${MIRROR_DUP:-5}"
+export LIVECD_PROFILE="${LIVECD_PROFILE:-ultralite}"
+echo "using mirror ${MIRROR}, MIRROR_DUP=${MIRROR_DUP}"
 echo "using profile ${LIVECD_PROFILE}"
 
 configure_archbootstrap() {
@@ -30,7 +31,10 @@ arch-chroot() {
 
 makelivecd() {
     cd /
-    echo 'Server = '"$MIRROR"'/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+    cat /dev/null > /etc/pacman.d/mirrorlist
+    for _ in $(seq ${MIRROR_DUP}); do
+        echo 'Server = '"$MIRROR"'/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
+    done
     pacman-key --init
     pacman-key --populate archlinux
     pacman --noconfirm --needed -Syu base base-devel archiso python
