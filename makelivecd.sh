@@ -33,7 +33,11 @@ configure_archbootstrap_aarch64() {
     curl -o "$bootstrap_tarball" "${MIRROR}/${ISO_DIR}/${bootstrap_tarball}"
     md5sum -c md5sum
     mkdir root.x86_64
+    ln -s root.x86_64 root.aarch64
     tar xzf "$bootstrap_tarball" -C root.x86_64
+    cp /usr/bin/qemu-aarch64-static root.x86_64/usr/bin/
+    cp contrib/arch-chroot root.x86_64/usr/bin/
+    chmod +x root.x86_64/usr/bin/arch-chroot
 }
 
 arch-chroot() {
@@ -63,6 +67,7 @@ makelivecd() {
         done > /etc/pacman.d/mirrorlist
         pacman-key --init
         pacman-key --populate archlinuxarm
+        rm -fv /usr/bin/arch-chroot
         pacman --noconfirm --needed -Syu base base-devel python \
             dosfstools mtools squashfs-tools arch-install-scripts libisoburn
 

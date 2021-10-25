@@ -35,6 +35,13 @@ jobs:
       with:
         ref: master
 
+    # install deps
+    - name: Install deps
+      shell: bash
+      run: |
+        sudo apt update -qq
+        sudo apt install -y tree rsync openssh-client qemu-user-static
+
     # Runs a single command using the runners shell
     - name: Run makelivecd script
       shell: bash
@@ -53,8 +60,6 @@ jobs:
         SSHPRIVKEY: ${{ secrets.KEY }}
       shell: bash
       run: |
-        sudo apt update -qq
-        sudo apt install -y tree rsync openssh-client
         cd root.x86_64/livecd/releng
         sudo chown -R $UID upload
         sudo chown $UID .
