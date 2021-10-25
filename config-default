@@ -1,0 +1,40 @@
+pre_build() {
+
+    # add custom/rootoverlay to airootfs
+    cp -rvT /custom/rootoverlay airootfs
+    # add archiso_pxe_dns to mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
+    # add ntfs-3g to mkinitcpio.conf
+    sed -i 's/\(BINARIES=(\)/\1mount.ntfs /g' airootfs/etc/mkinitcpio.conf
+
+    # no customize_airootfs.sh? no problem
+    mkdir -p airootfs/etc/pacman.d/hooks
+    cat << EOF > airootfs/etc/pacman.d/hooks/zzzz98-customize-airootfs.hook
+# remove from airootfs!
+[Trigger]
+Operation = Install
+Type = Package
+Target = base
+
+[Action]
+Description = Running customize-airootfs...
+When = PostTransaction
+Exec = /bin/sh -c "systemctl disable sshd reflector && \
+passwd -d root"
+EOF
+
+    # pkglist check
+    compatver=v57
+    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
+    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
+    curl -L -o packages.x86_64.compat "$compatraw"
+    diff packages.x86_64 packages.x86_64.compat
+    rm packages.x86_64.compat
+
+    # alter packages
+    cat << EOF >> packages.x86_64
+EOF
+    cat << EOF > packages.x86_64.remove
+EOF
+
+}

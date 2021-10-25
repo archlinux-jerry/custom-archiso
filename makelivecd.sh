@@ -31,10 +31,9 @@ arch-chroot() {
 
 makelivecd() {
     cd /
-    cat /dev/null > /etc/pacman.d/mirrorlist
     for _ in $(seq ${MIRROR_DUP}); do
-        echo 'Server = '"$MIRROR"'/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
-    done
+        echo 'Server = '"$MIRROR"'/$repo/os/$arch'
+    done > /etc/pacman.d/mirrorlist
     pacman-key --init
     pacman-key --populate archlinux
     pacman --noconfirm --needed -Syu base base-devel archiso python
