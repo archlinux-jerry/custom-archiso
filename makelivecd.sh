@@ -2,12 +2,15 @@
 set -ex
 
 export MIRROR="${MIRROR:-https://mirror.pkgbuild.com}"
+export MIRROR_AARCH64="${MIRROR_AARCH64:-https://ftp.halifax.rwth-aachen.de/archlinux-arm}"
 export MIRROR_DUP="${MIRROR_DUP:-5}"
 export LIVECD_PROFILE="${LIVECD_PROFILE:-ultralite}"
-echo "using mirror ${MIRROR}, MIRROR_DUP=${MIRROR_DUP}"
 echo "using profile ${LIVECD_PROFILE}"
+source "config-${LIVECD_PROFILE}"
+[[ "$ISO_ARCH" == "aarch64" ]] && MIRROR="$MIRROR_AARCH64"
+echo "using mirror ${MIRROR}, MIRROR_DUP=${MIRROR_DUP}"
 
-configure_archbootstrap() {
+configure_archbootstrap_x86_64() {
     ISO_DIR="iso/latest"
     MD5SUM="${MIRROR}/${ISO_DIR}/md5sums.txt"
     curl -o md5sum "$MD5SUM"
@@ -19,6 +22,20 @@ configure_archbootstrap() {
     md5sum -c md5sum
     tar xzf "$bootstrap_tarball"
 }
+configure_archbootstrap_aarch64() {
+    ISO_DIR="os"
+    MD5SUM="${MIRROR}/${ISO_DIR}/ArchLinuxARM-aarch64-latest.tar.gz.md5"
+    curl -o md5sum "$MD5SUM"
+    md5=$(cat md5sum |grep -F '.tar.gz')
+    bootstrap_tarball=$(awk '{print $2;}' <<< "$md5")
+    echo "$md5" > md5sum
+    date '+%Y-%m-01' > version
+    curl -o "$bootstrap_tarball" "${MIRROR}/${ISO_DIR}/${bootstrap_tarball}"
+    md5sum -c md5sum
+    mkdir root.x86_64
+    tar xzf "$bootstrap_tarball" -C root.x86_64
+}
+
 arch-chroot() {
     cp -av $0 ./root.x86_64/$0
     cp -av "config-${LIVECD_PROFILE}" ./root.x86_64/"config-${LIVECD_PROFILE}"
@@ -31,12 +48,35 @@ arch-chroot() {
 
 makelivecd() {
     cd /
-    for _ in $(seq ${MIRROR_DUP}); do
-        echo 'Server = '"$MIRROR"'/$repo/os/$arch'
-    done > /etc/pacman.d/mirrorlist
-    pacman-key --init
-    pacman-key --populate archlinux
-    pacman --noconfirm --needed -Syu base base-devel archiso python
+    source "/config-${LIVECD_PROFILE}"
+    [[ "$ISO_ARCH" == "x86_64" ]] && {
+        for _ in $(seq ${MIRROR_DUP}); do
+            echo 'Server = '"$MIRROR"'/$repo/os/$arch'
+        done > /etc/pacman.d/mirrorlist
+        pacman-key --init
+        pacman-key --populate archlinux
+        pacman --noconfirm --needed -Syu base base-devel python archiso
+    }
+    [[ "$ISO_ARCH" == "aarch64" ]] && {
+        for _ in $(seq ${MIRROR_DUP}); do
+            echo 'Server = '"$MIRROR"'/$arch/$repo'
+        done > /etc/pacman.d/mirrorlist
+        pacman-key --init
+        pacman-key --populate archlinuxarm
+        pacman --noconfirm --needed -Syu base base-devel python \
+            dosfstools mtools squashfs-tools arch-install-scripts libisoburn
+
+        curl -Lo aarch64.tar.gz "https://github.com/archlinux-jerry/archiso-aarch64/archive/aarch64.tar.gz"
+        tar -xvf aarch64.tar.gz
+        rm -rf /usr/share/archiso/
+        cp -rv archiso-aarch64-aarch64 /usr/share/archiso
+        cp /usr/share/archiso/archiso/mkarchiso /usr/bin/mkarchiso
+        chmod +x /usr/bin/mkarchiso
+        pushd /usr/share/archiso/configs/releng
+            mv packages.aarch64 packages.x86_64
+            ln -s packages.x86_64 packages.aarch64
+        popd
+    }
 
     # make sure patches apply
     /custom/patches/archiso_pxe_http.hook/patch.sh
@@ -47,7 +87,6 @@ makelivecd() {
     cp -r /usr/share/archiso/configs/releng releng.1
     cd releng
 
-    source "/config-${LIVECD_PROFILE}"
     pre_build
 
     cat packages.x86_64 |sort |uniq > packages.x86_64.dedup
@@ -83,6 +122,7 @@ finalize() {
     popd
     # copy netboot content
     cp -av work/iso/arch "upload/${realver}/"
+    [[ "$ISO_ARCH" == "aarch64" ]] && mcopy -snv -i "work/efiboot.img" "::/arch/boot" "upload/${realver}/arch/"
     # makelink /archlinux/iso -> ../
     mkdir upload/archlinux
     # generic archlinux mirror structure
@@ -99,7 +139,7 @@ if [ -e '/makelivecd.sh' ]; then
     makelivecd
     finalize
 else
-    configure_archbootstrap
+    configure_archbootstrap_${ISO_ARCH}
     arch-chroot
 fi
 exit 0

@@ -1,3 +1,5 @@
+ISO_ARCH=x86_64
+
 pre_build() {
 
     # add custom/rootoverlay to airootfs

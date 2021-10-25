@@ -1,4 +1,4 @@
-ISO_ARCH=x86_64
+ISO_ARCH=aarch64
 
 pre_build() {
 
@@ -24,14 +24,6 @@ When = PostTransaction
 Exec = /bin/sh -c "systemctl disable sshd reflector && \
 passwd -d root"
 EOF
-
-    # pkglist check
-    compatver=v57
-    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
-    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
-    curl -L -o packages.x86_64.compat "$compatraw"
-    diff packages.x86_64 packages.x86_64.compat
-    rm packages.x86_64.compat
 
     # alter packages
     cat << EOF >> packages.x86_64
