@@ -22,7 +22,7 @@ Target = base
 Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "systemctl disable sshd reflector && \
-sed -i 's/exec env -i/exec unshare --time --boottime 44409600 env -i/g' /usr/lib/initcpio/init && \
+sed -i 's/exec env -i/exec unshare --time --boottime \${uptimesec:-44409600} env -i/g' /usr/lib/initcpio/init && \
 mkinitcpio -P && \
 passwd -d root"
 EOF
