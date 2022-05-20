@@ -31,7 +31,7 @@ Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "chsh -s /bin/bash root && \
 systemctl disable sshd && \
-sed -i.bak '/^[ ]*# unzip modules prior to recompression[ ]*$/,/^[ ]*done[ ]*$/d' /usr/lib/initcpio/functions && \
+sed -i.bak '/Generating module dependencies/ifor m in \$moduledest/kernel/*.ko;do xz \$m;done' /usr/lib/initcpio/functions && \
 { diff -u /usr/lib/initcpio/functions{.bak,} || true; } && \
 mkinitcpio -P && \
 passwd -d root && \
