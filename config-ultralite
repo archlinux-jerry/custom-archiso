@@ -39,7 +39,7 @@ find /etc/systemd/system -xtype l -delete -print"
 EOF
 
     # pkglist check
-    compatver=v63
+    compatver=v64
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
@@ -53,7 +53,7 @@ bash-completion
 EOF
     cat << EOF > packages.x86_64.remove
 b43-fwcutter
-bind-tools
+bind
 broadcom-wl
 clonezilla
 crda
