@@ -14,7 +14,7 @@ configure_archbootstrap_x86_64() {
     ISO_DIR="iso/latest"
     MD5SUM="${MIRROR}/${ISO_DIR}/md5sums.txt"
     curl -o md5sum "$MD5SUM"
-    md5=$(cat md5sum |grep -F '.tar.gz')
+    md5=$(cat md5sum |grep -F '.tar.gz' |grep -Fv 'archlinux-bootstrap-x86_64.tar')
     bootstrap_tarball=$(awk '{print $2;}' <<< "$md5")
     echo "$md5" > md5sum
     echo "$bootstrap_tarball" |python3 -c 'print(input().split("-")[2])' > version
