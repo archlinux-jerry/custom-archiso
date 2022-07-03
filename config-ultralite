@@ -5,10 +5,11 @@ pre_build() {
     # add custom/rootoverlay to airootfs
     cp -rvT /custom/rootoverlay airootfs
 
-    # drop speech from sdboot, just forget about syslinux
+    # drop speech from sdboot, just forget about grub and syslinux, writing sed is hard
     rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
-    # drop ucode from loader
+    # drop ucode from loader (systemd-boot, grub, syslinux)
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
+    sed -i 's|^\([ ]*\)initrd .*|\1initrd /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' grub/grub.cfg
     sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # drop archiso_kms from mkinitcpio.conf
     sed -i 's/archiso_kms //g' airootfs/etc/mkinitcpio.conf
