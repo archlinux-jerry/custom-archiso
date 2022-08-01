@@ -23,6 +23,7 @@ jobs:
       matrix:
         LIVECD_PROFILE:
         - ultralite
+        - ultralite-zram
         - default
         - xfce
         - aarch64-default

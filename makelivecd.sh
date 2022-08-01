@@ -59,6 +59,7 @@ makelivecd() {
         done > /etc/pacman.d/mirrorlist
         pacman-key --init
         pacman-key --populate archlinux
+        pacman --noconfirm --needed -Sy archlinux-keyring
         pacman --noconfirm --needed -Syu base base-devel python archiso
     }
     [[ "$ISO_ARCH" == "aarch64" ]] && {
@@ -67,6 +68,7 @@ makelivecd() {
         done > /etc/pacman.d/mirrorlist
         pacman-key --init
         pacman-key --populate archlinuxarm
+        pacman --noconfirm --needed -Sy archlinuxarm-keyring
         rm -fv /usr/bin/arch-chroot
         pacman --noconfirm --needed -Syu base base-devel python \
             dosfstools mtools squashfs-tools arch-install-scripts libisoburn

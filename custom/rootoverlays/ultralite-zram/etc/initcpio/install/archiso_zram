@@ -1,0 +1,14 @@
+#!/bin/bash
+
+build() {
+    add_module zram
+    add_binary mkswap
+    add_binary swapon
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+archiso_zram
+HELPEOF
+}

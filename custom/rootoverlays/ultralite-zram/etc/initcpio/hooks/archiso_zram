@@ -1,0 +1,15 @@
+#!/bin/ash
+
+run_hook () {
+    memtotal=$(sed -n 's/MemTotal: *\([0-9]*\) kB/\1/p' /proc/meminfo)
+    [ $memtotal -gt 786432 ] && return
+    modprobe zram
+    [ -e /sys/block/zram0 ] || cat /sys/class/zram-control/hot_add > /dev/null
+    echo 1 > /sys/block/zram0/reset
+    echo zstd > /sys/block/zram0/comp_algorithm
+    echo 1G > /sys/block/zram0/disksize
+    chmod 0660 /dev/zram0
+    mkswap /dev/zram0
+    echo 0 > /sys/module/zswap/parameters/enabled
+    swapon /dev/zram0
+}
