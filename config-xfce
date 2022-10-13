@@ -51,7 +51,7 @@ autologin-session=xfce
 EOF
 
     # pkglist check
-    compatver=v64
+    compatver=v67
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
