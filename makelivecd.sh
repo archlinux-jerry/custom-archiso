@@ -12,14 +12,14 @@ echo "using mirror ${MIRROR}, MIRROR_DUP=${MIRROR_DUP}"
 
 configure_archbootstrap_x86_64() {
     ISO_DIR="iso/latest"
-    MD5SUM="${MIRROR}/${ISO_DIR}/md5sums.txt"
-    curl -o md5sum "$MD5SUM"
-    md5=$(cat md5sum |grep -F '.tar.gz' |grep -Fv 'archlinux-bootstrap-x86_64.tar')
-    bootstrap_tarball=$(awk '{print $2;}' <<< "$md5")
-    echo "$md5" > md5sum
+    SHA256SUM="${MIRROR}/${ISO_DIR}/sha256sums.txt"
+    curl -o sha256sum "$SHA256SUM"
+    sha256=$(cat sha256sum |grep -F '.tar.gz' |grep -Fv 'archlinux-bootstrap-x86_64.tar')
+    bootstrap_tarball=$(awk '{print $2;}' <<< "$sha256")
+    echo "$sha256" > sha256sum
     echo "$bootstrap_tarball" |python3 -c 'print(input().split("-")[2])' > version
     curl -o "$bootstrap_tarball" "${MIRROR}/${ISO_DIR}/${bootstrap_tarball}"
-    md5sum -c md5sum
+    sha256sum -c sha256sum
     tar xzf "$bootstrap_tarball"
 }
 configure_archbootstrap_aarch64() {
@@ -125,7 +125,9 @@ finalize() {
     pushd "upload/${realver}"
         md5sum *.iso > md5sums.txt
         sha1sum *.iso > sha1sums.txt
-        cat md5sums.txt sha1sums.txt
+        sha256sum *.iso > sha256sums.txt
+        b2sum *.iso > b2sums.txt
+        cat md5sums.txt sha1sums.txt sha256sums.txt b2sums.txt
     popd
     # copy netboot content
     cp -av work/iso/arch "upload/${realver}/"
