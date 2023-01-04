@@ -40,7 +40,7 @@ find /etc/systemd/system -xtype l -delete -print"
 EOF
 
     # pkglist check
-    compatver=v67
+    compatver=v69
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
@@ -139,6 +139,7 @@ open-iscsi
 open-vm-tools
 ipw2100-fw
 ipw2200-fw
+memtest86+-efi
 EOF
 
 }
