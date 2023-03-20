@@ -23,11 +23,9 @@ jobs:
       matrix:
         LIVECD_PROFILE:
         - ultralite
-        - ultralite-zram
         - default
         - xfce
         - aarch64-default
-        - uptime
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
