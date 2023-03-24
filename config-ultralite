@@ -11,8 +11,8 @@ pre_build() {
     sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
     sed -i 's|^\([ ]*\)initrd .*|\1initrd /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' grub/grub.cfg
     sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
-    # drop archiso_kms from mkinitcpio.conf
-    sed -i 's/archiso_kms //g' airootfs/etc/mkinitcpio.conf
+    # drop kms from mkinitcpio.conf
+    sed -i 's/kms //g' airootfs/etc/mkinitcpio.conf
     # add archiso_pxe_dns to mkinitcpio.conf
     sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
     # add ntfs-3g to mkinitcpio.conf
@@ -32,7 +32,7 @@ Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "chsh -s /bin/bash root && \
 systemctl disable sshd && \
-sed -i.bak '/Generating module dependencies/ifor m in \$moduledest/kernel/*.ko;do xz \$m;done' /usr/lib/initcpio/functions && \
+echo c2VkIC1lICcvTU9EVUxFU19ERUNPTVBSRVNTL2lpZiB0cnVlOyB0aGVuJyAtZSAnL01PRFVMRVNfREVDT01QUkVTUy9kJyAtZSAnL0dlbmVyYXRpbmcgbW9kdWxlIGRlcGVuZGVuY2llcy9pZmluZCAiJEJVSUxEUk9PVFwvJF9kX2ttb2R1bGVkaXIiIC10eXBlIGYgLW5hbWUgIioua28iIC1wcmludDAgfHhhcmdzIC0wIC1QIiQobnByb2MpIiAtSXt9IHh6IC0teDg2IC0tbHptYTIge30nIC1pLmJhayAvdXNyL2xpYi9pbml0Y3Bpby9mdW5jdGlvbnMK |base64 -d |/bin/sh && \
 { diff -u /usr/lib/initcpio/functions{.bak,} || true; } && \
 mkinitcpio -P && \
 passwd -d root && \
