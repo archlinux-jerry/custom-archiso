@@ -5,6 +5,8 @@ pre_build() {
     # add custom/rootoverlay to airootfs
     cp -rvT /custom/rootoverlay airootfs
 
+    # grub: no beep
+    sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
     # drop speech from sdboot, just forget about grub and syslinux, writing sed is hard
     rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
     # drop ucode from loader (systemd-boot, grub, syslinux)

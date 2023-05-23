@@ -4,6 +4,9 @@ pre_build() {
 
     # add custom/rootoverlay to airootfs
     cp -rvT /custom/rootoverlay airootfs
+
+    # grub: no beep ! TODO: update aarch64 mkarchiso
+    # sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
     # add archiso_pxe_dns to mkinitcpio.conf
     sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
     # add ntfs-3g to mkinitcpio.conf

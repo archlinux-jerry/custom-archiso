@@ -80,16 +80,37 @@ jobs:
         [ -n "$SSHPRIVKEY" ] || (echo SSHPRIVKEY is not set; exit 1)
         echo "Starting Upload      ..."
         rsync --delete -rlvPh -e "ssh -l ${RSYNC_HOST%@*} -i ~/key -o StrictHostKeyChecking=ask -o UserKnownHostsFile=~/kh" upload/ "${RSYNC_HOST#*@}:${RSYNC_PATH}/${LIVECD_PROFILE}"
+
+  keepalive:
+    name: do keepalive
+    # The type of runner that the job will run on
+    needs: [build]
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-20.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        ref: master
+    - name: keepalive
+      env:
+        SSHPRIVKEY: ${{ secrets.KEY }}
+      shell: bash
+      run: |
         echo "Starting KeepAlive   ..."
+        trap "shred -v ~/key" ERR EXIT
+        echo "$SSHPRIVKEY" |base64 -d > ~/key
+        pushd .
         mkdir -p ~/.ssh
         echo "IdentityFile $(realpath ~/key)" > ~/.ssh/config
         ssh -o StrictHostKeyChecking=no git@github.com -T || true
-        mkdir keepalive
-        pushd keepalive
-        git init .
-        git config user.name "keepalivebot"
         git config user.email "bot@github.com"
-        git remote add g git@github.com:archlinux-jerry/custom-archiso.git
-        git commit --allow-empty -m 'keepalive'
-        git push -q -f -u g master:keepalive
+        git config user.name "bot"
+        git reset --soft HEAD
+        git commit --allow-empty -m "[skip ci] keepalive at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        while ! git push origin master; do sleep 10; done
+        git show --name-only |grep -Fq '[skip ci] keepalive at'
+        git reset --soft HEAD~1
+        while ! git push --force origin master; do sleep 10; done
         popd
