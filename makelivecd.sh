@@ -1,14 +1,13 @@
 #!/bin/bash
 set -ex
 
-export MIRROR="${MIRROR:-https://mirror.pkgbuild.com}"
+export MIRROR="${MIRROR:-https://mirrors.edge.kernel.org/archlinux}"
 export MIRROR_AARCH64="${MIRROR_AARCH64:-https://ftp.halifax.rwth-aachen.de/archlinux-arm}"
-export MIRROR_DUP="${MIRROR_DUP:-5}"
 export LIVECD_PROFILE="${LIVECD_PROFILE:-ultralite}"
 echo "using profile ${LIVECD_PROFILE}"
 source "config-${LIVECD_PROFILE}"
 [[ "$ISO_ARCH" == "aarch64" ]] && MIRROR="$MIRROR_AARCH64"
-echo "using mirror ${MIRROR}, MIRROR_DUP=${MIRROR_DUP}"
+echo "using mirror ${MIRROR}"
 
 configure_archbootstrap_x86_64() {
     ISO_DIR="iso/latest"
@@ -54,18 +53,15 @@ makelivecd() {
     cd /
     source "/config-${LIVECD_PROFILE}"
     [[ "$ISO_ARCH" == "x86_64" ]] && {
-        for _ in $(seq ${MIRROR_DUP}); do
-            echo 'Server = '"$MIRROR"'/$repo/os/$arch'
-        done > /etc/pacman.d/mirrorlist
+        echo 'Server = '"$MIRROR"'/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+        echo 'Server = https://archive.archlinux.org/.all' >> /etc/pacman.d/mirrorlist
         pacman-key --init
         pacman-key --populate archlinux
         pacman --noconfirm --needed -Sy archlinux-keyring
         pacman --noconfirm --needed -Syu base base-devel python archiso
     }
     [[ "$ISO_ARCH" == "aarch64" ]] && {
-        for _ in $(seq ${MIRROR_DUP}); do
-            echo 'Server = '"$MIRROR"'/$arch/$repo'
-        done > /etc/pacman.d/mirrorlist
+        echo 'Server = '"$MIRROR"'/$arch/$repo' > /etc/pacman.d/mirrorlist
         pacman-key --init
         pacman-key --populate archlinuxarm
         pacman --noconfirm --needed -Sy archlinuxarm-keyring
@@ -128,6 +124,7 @@ finalize() {
         sha256sum *.iso > sha256sums.txt
         b2sum *.iso > b2sums.txt
         cat md5sums.txt sha1sums.txt sha256sums.txt b2sums.txt
+        ln -s *.iso archlinux-${ISO_ARCH}.iso
     popd
     # copy netboot content
     cp -av work/iso/arch "upload/${realver}/"
