@@ -35,6 +35,7 @@ useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
 echo -e 'archiso\narchiso' | passwd archiso && \
 passwd -d root && \
+install -Dm644 <(echo cG9sa2l0LmFkZFJ1bGUoZnVuY3Rpb24oYWN0aW9uLCBzdWJqZWN0KSB7CiAgICBpZiAoc3ViamVjdC5pc0luR3JvdXAoIndoZWVsIikpIHsKICAgICAgICByZXR1cm4gcG9sa2l0LlJlc3VsdC5ZRVM7CiAgICB9Cn0pOwo=|base64 -d) /etc/polkit-1/rules.d/49-nopasswd_global.rules && \
 rm -fv /etc/lightdm/lightdm.conf.pacnew && \
 rm -fv /etc/resolv.conf && \
 touch /etc/resolv.conf && \
