@@ -11,9 +11,10 @@ pre_build() {
     # add archiso_pxe_dns to mkinitcpio.conf
     sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add ntfs-3g to mkinitcpio.conf
-    echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso_custom.conf
+    echo >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add rndis_host to mkinitcpio.conf
-    echo 'MODULES+=(rndis_host)' >> airootfs/etc/mkinitcpio.conf.d/archiso_custom.conf
+    echo 'MODULES+=(rndis_host)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
@@ -55,7 +56,7 @@ autologin-session=xfce
 EOF
 
     # pkglist check
-    compatver=v71
+    compatver=v72
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
