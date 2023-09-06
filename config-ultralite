@@ -4,6 +4,7 @@ pre_build() {
 
     # add custom/rootoverlay to airootfs
     cp -rvT /custom/rootoverlay airootfs
+    [ -d "/custom/rootoverlays/$LIVECD_PROFILE" ] && cp -rvT "/custom/rootoverlays/$LIVECD_PROFILE" airootfs
 
     # grub: no beep
     sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
@@ -14,11 +15,11 @@ pre_build() {
     sed -i 's|^\([ ]*\)initrd .*|\1initrd /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' grub/grub.cfg
     sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # drop kms from mkinitcpio.conf
-    sed -i 's/kms //g' airootfs/etc/mkinitcpio.conf
+    sed -i 's/kms //g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add archiso_pxe_dns to mkinitcpio.conf
-    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add ntfs-3g to mkinitcpio.conf
-    sed -i 's/\(BINARIES=(\)/\1mount.ntfs /g' airootfs/etc/mkinitcpio.conf
+    echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso_custom.conf
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks

@@ -4,15 +4,16 @@ pre_build() {
 
     # add custom/rootoverlay to airootfs
     cp -rvT /custom/rootoverlay airootfs
+    [ -d "/custom/rootoverlays/$LIVECD_PROFILE" ] && cp -rvT "/custom/rootoverlays/$LIVECD_PROFILE" airootfs
 
     # grub: no beep
     sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
     # add archiso_pxe_dns to mkinitcpio.conf
-    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add ntfs-3g to mkinitcpio.conf
-    sed -i 's/\(BINARIES=(\)/\1mount.ntfs /g' airootfs/etc/mkinitcpio.conf
+    echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso_custom.conf
     # add rndis_host to mkinitcpio.conf
-    sed -i 's/\(MODULES==(\)/\1rndis_host /g' airootfs/etc/mkinitcpio.conf
+    echo 'MODULES+=(rndis_host)' >> airootfs/etc/mkinitcpio.conf.d/archiso_custom.conf
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
@@ -29,13 +30,12 @@ When = PostTransaction
 Exec = /bin/sh -c "systemctl enable NetworkManager lightdm && \
 systemctl disable sshd iwd reflector systemd-networkd systemd-resolved && \
 systemctl set-default graphical.target && \
-sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config && \
+sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config.d/10-archiso.conf && \
 groupadd -r autologin && \
 useradd -m -G autologin,wheel -g users -s /usr/bin/zsh archiso && \
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
 echo -e 'archiso\narchiso' | passwd archiso && \
 passwd -d root && \
-install -Dm644 <(echo cG9sa2l0LmFkZFJ1bGUoZnVuY3Rpb24oYWN0aW9uLCBzdWJqZWN0KSB7CiAgICBpZiAoc3ViamVjdC5pc0luR3JvdXAoIndoZWVsIikpIHsKICAgICAgICByZXR1cm4gcG9sa2l0LlJlc3VsdC5ZRVM7CiAgICB9Cn0pOwo=|base64 -d) /etc/polkit-1/rules.d/49-nopasswd_global.rules && \
 rm -fv /etc/lightdm/lightdm.conf.pacnew && \
 rm -fv /etc/resolv.conf && \
 touch /etc/resolv.conf && \
