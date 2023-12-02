@@ -25,7 +25,6 @@ jobs:
         - ultralite
         - default
         - xfce
-        - aarch64-default
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
