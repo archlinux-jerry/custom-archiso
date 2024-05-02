@@ -13,13 +13,13 @@ configure_archbootstrap_x86_64() {
     ISO_DIR="iso/latest"
     SHA256SUM="${MIRROR}/${ISO_DIR}/sha256sums.txt"
     curl -o sha256sum "$SHA256SUM"
-    sha256=$(cat sha256sum |grep -F '.tar.gz' |grep -Fv 'archlinux-bootstrap-x86_64.tar')
+    sha256=$(cat sha256sum |grep -F '.tar.zst' |grep -Fv 'archlinux-bootstrap-x86_64.tar')
     bootstrap_tarball=$(awk '{print $2;}' <<< "$sha256")
     echo "$sha256" > sha256sum
     echo "$bootstrap_tarball" |python3 -c 'print(input().split("-")[2])' > version
     curl -o "$bootstrap_tarball" "${MIRROR}/${ISO_DIR}/${bootstrap_tarball}"
     sha256sum -c sha256sum
-    tar xzf "$bootstrap_tarball"
+    tar --zstd -xf "$bootstrap_tarball"
 }
 configure_archbootstrap_aarch64() {
     ISO_DIR="os"
