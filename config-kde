@@ -15,6 +15,11 @@ pre_build() {
     # add ntfs-3g to mkinitcpio.conf
     echo >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
     echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    # add rndis_host to mkinitcpio.conf
+    echo 'MODULES+=(rndis_host)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    # add kernel cmdline
+    sed -i 's/archisosearchuuid.*$/& sysrq_always_enabled=1 nvidia_drm.modeset=1 nvidia_drm.fbdev=1 systemd.debug_shell/' efiboot/loader/entries/*.conf grub/grub.cfg syslinux/*.cfg
+
 
     # no customize_airootfs.sh? no problem
     mkdir -p airootfs/etc/pacman.d/hooks
@@ -23,13 +28,30 @@ pre_build() {
 [Trigger]
 Operation = Install
 Type = Package
-Target = base
+Target = networkmanager
 
 [Action]
 Description = Running customize-airootfs...
 When = PostTransaction
-Exec = /bin/sh -c "systemctl disable sshd reflector && \
-passwd -d root"
+Exec = /bin/sh -c "systemctl enable NetworkManager sddm bluetooth && \
+systemctl disable sshd iwd reflector systemd-networkd systemd-networkd.socket systemd-resolved && \
+systemctl set-default graphical.target && \
+sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config.d/10-archiso.conf && \
+useradd -m -G wheel -g users -s /usr/bin/zsh archiso && \
+echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+echo -e 'archiso\narchiso' | passwd archiso && \
+passwd -d root && \
+rm -fv /etc/resolv.conf && \
+touch /etc/resolv.conf && \
+true"
+EOF
+
+    # sddm autologin
+    mkdir -p airootfs/etc/sddm.conf.d
+    cat << EOF > airootfs/etc/sddm.conf.d/autologin.conf
+[Autologin]
+User=archiso
+Session=plasma
 EOF
 
     # pkglist check
@@ -42,8 +64,30 @@ EOF
 
     # alter packages
     cat << EOF >> packages.x86_64
+nano
+bash-completion
+nvidia-open
+mesa
+virtualbox-guest-utils
+sddm
+plasma-desktop
+plasma-nm
+plasma-pa
+konsole
+bluedevil
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+sof-firmware
+bluez
+networkmanager
+nm-connection-editor
+firefox
+gparted
 EOF
     cat << EOF > packages.x86_64.remove
+virtualbox-guest-utils-nox
 EOF
 
 }

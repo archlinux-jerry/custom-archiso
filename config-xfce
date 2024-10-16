@@ -8,6 +8,8 @@ pre_build() {
 
     # grub: no beep
     sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
+    # sdboot: no beep
+    sed -i 's/beep on/beep off/g' efiboot/loader/loader.conf
     # add archiso_pxe_dns to mkinitcpio.conf
     sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add ntfs-3g to mkinitcpio.conf

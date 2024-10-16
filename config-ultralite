@@ -8,12 +8,10 @@ pre_build() {
 
     # grub: no beep
     sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
+    # sdboot: no beep
+    sed -i 's/beep on/beep off/g' efiboot/loader/loader.conf
     # drop speech from sdboot, just forget about grub and syslinux, writing sed is hard
     rm -f efiboot/loader/entries/archiso-x86_64-speech-linux.conf
-    # drop ucode from loader (systemd-boot, grub, syslinux)
-    sed -i '/ucode\.img/d' efiboot/loader/entries/*.conf
-    sed -i 's|^\([ ]*\)initrd .*|\1initrd /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' grub/grub.cfg
-    sed -i 's|^INITRD .*$|INITRD /%INSTALL_DIR%/boot/x86_64/initramfs-linux.img|g' syslinux/*.cfg
     # drop kms from mkinitcpio.conf
     sed -i 's/kms //g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
     # add archiso_pxe_dns to mkinitcpio.conf
