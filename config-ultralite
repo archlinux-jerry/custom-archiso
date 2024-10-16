@@ -46,7 +46,7 @@ find /etc/systemd/system -xtype l -delete -print"
 EOF
 
     # pkglist check
-    compatver=v78
+    compatver=v80
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
@@ -152,6 +152,7 @@ sequoia-sq
 tpm2-tools
 bolt
 ldns
+reiserfsprogs
 EOF
 
 }

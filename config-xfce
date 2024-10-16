@@ -29,7 +29,7 @@ Target = networkmanager
 Description = Running customize-airootfs...
 When = PostTransaction
 Exec = /bin/sh -c "systemctl enable NetworkManager lightdm && \
-systemctl disable sshd iwd reflector systemd-networkd systemd-resolved && \
+systemctl disable sshd iwd reflector systemd-networkd systemd-networkd.socket systemd-resolved && \
 systemctl set-default graphical.target && \
 sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config.d/10-archiso.conf && \
 groupadd -r autologin && \
@@ -56,7 +56,7 @@ autologin-session=xfce
 EOF
 
     # pkglist check
-    compatver=v78
+    compatver=v80
     compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
     compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
     curl -L -o packages.x86_64.compat "$compatraw"
