@@ -73,7 +73,9 @@ sddm
 plasma-desktop
 plasma-nm
 plasma-pa
+kscreen
 konsole
+dolphin
 bluedevil
 pipewire
 pipewire-alsa
