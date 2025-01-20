@@ -1,0 +1,150 @@
+ISO_ARCH=x86_64
+
+pre_build() {
+
+    # add custom/rootoverlay to airootfs
+    cp -rvT /custom/rootoverlay airootfs
+    [ -d "/custom/rootoverlays/$LIVECD_PROFILE" ] && cp -rvT "/custom/rootoverlays/$LIVECD_PROFILE" airootfs
+
+    # grub: no beep
+    sed -i '/^# GRUB init tune for accessibility$/,/^$/s/^play/# play/g' grub/grub.cfg
+    # sdboot: no beep
+    sed -i 's/beep on/beep off/g' efiboot/loader/loader.conf
+    # add archiso_pxe_dns to mkinitcpio.conf
+    sed -i 's/archiso_pxe_common/archiso_pxe_dns archiso_pxe_common/g' airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    # add ntfs-3g to mkinitcpio.conf
+    echo >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    echo 'BINARIES+=(mount.ntfs)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    # add rndis_host to mkinitcpio.conf
+    echo 'MODULES+=(rndis_host)' >> airootfs/etc/mkinitcpio.conf.d/archiso.conf
+    # add kernel cmdline
+    sed -i 's/archisosearchuuid.*$/& sysrq_always_enabled=1 nvidia_drm.modeset=1 nvidia_drm.fbdev=1 systemd.debug_shell/' efiboot/loader/entries/*.conf grub/grub.cfg syslinux/*.cfg
+
+
+    # no customize_airootfs.sh? no problem
+    mkdir -p airootfs/etc/pacman.d/hooks
+    cat << EOF > airootfs/etc/pacman.d/hooks/zzzz98-customize-airootfs.hook
+# remove from airootfs!
+[Trigger]
+Operation = Install
+Type = Package
+Target = networkmanager
+
+[Action]
+Description = Running customize-airootfs...
+When = PostTransaction
+Exec = /bin/sh -c "systemctl enable NetworkManager gdm bluetooth && \
+systemctl disable sshd iwd reflector systemd-networkd systemd-networkd.socket systemd-resolved && \
+systemctl set-default graphical.target && \
+sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config.d/10-archiso.conf && \
+useradd -m -G wheel -g users -s /usr/bin/zsh archiso && \
+echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+echo -e 'archiso\narchiso' | passwd archiso && \
+passwd -d root && \
+rm -fv /etc/resolv.conf && \
+touch /etc/resolv.conf && \
+true"
+EOF
+
+    # gdm autologin
+    mkdir -p airootfs/etc/gdm
+    cat << EOF > airootfs/etc/gdm/custom.conf
+[daemon]
+TimedLoginEnable=true
+TimedLogin=archiso
+TimedLoginDelay=1
+EOF
+
+    # pkglist check
+    compatver=v81
+    compatlink="https://gitlab.archlinux.org/archlinux/archiso/-/blob/${compatver}/configs/releng/packages.x86_64"
+    compatraw="https://gitlab.archlinux.org/archlinux/archiso/-/raw/${compatver}/configs/releng/packages.x86_64"
+    curl -L -o packages.x86_64.compat "$compatraw"
+    diff packages.x86_64 packages.x86_64.compat
+    rm packages.x86_64.compat
+
+    # alter packages
+    cat << EOF >> packages.x86_64
+nano
+bash-completion
+nvidia-open
+mesa
+virtualbox-guest-utils
+gnome-tweaks
+gnome-terminal
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+sof-firmware
+bluez
+networkmanager
+nm-connection-editor
+firefox
+gparted
+vlc
+EOF
+    cat << EOF >> packages.x86_64
+baobab
+evince
+gdm
+gnome-terminal
+gnome-backgrounds
+gnome-calculator
+gnome-calendar
+gnome-characters
+gnome-clocks
+gnome-color-manager
+gnome-connections
+gnome-contacts
+gnome-control-center
+gnome-disk-utility
+gnome-font-viewer
+gnome-keyring
+gnome-logs
+gnome-maps
+gnome-menus
+gnome-music
+gnome-remote-desktop
+gnome-session
+gnome-settings-daemon
+gnome-shell
+gnome-shell-extensions
+gnome-software
+gnome-system-monitor
+gnome-text-editor
+gnome-tour
+gnome-user-docs
+gnome-user-share
+gnome-weather
+grilo-plugins
+gvfs
+gvfs-afc
+gvfs-dnssd
+gvfs-goa
+gvfs-google
+gvfs-gphoto2
+gvfs-mtp
+gvfs-nfs
+gvfs-onedrive
+gvfs-smb
+gvfs-wsdd
+loupe
+malcontent
+nautilus
+orca
+rygel
+simple-scan
+snapshot
+sushi
+tecla
+totem
+xdg-desktop-portal-gnome
+xdg-user-dirs-gtk
+yelp
+EOF
+    cat << EOF > packages.x86_64.remove
+virtualbox-guest-utils-nox
+EOF
+
+}
