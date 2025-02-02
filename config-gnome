@@ -145,6 +145,7 @@ yelp
 EOF
     cat << EOF > packages.x86_64.remove
 virtualbox-guest-utils-nox
+broadcom-wl
 EOF
 
 }
