@@ -33,8 +33,10 @@ Target = networkmanager
 [Action]
 Description = Running customize-airootfs...
 When = PostTransaction
-Exec = /bin/sh -c "systemctl enable NetworkManager gdm bluetooth && \
-systemctl disable sshd iwd reflector systemd-networkd systemd-networkd.socket systemd-resolved && \
+Exec = /bin/sh -c "true && \
+systemctl disable sshd iwd reflector systemd-networkd systemd-resolved && \
+systemctl mask systemd-networkd systemd-resolved && \
+systemctl enable NetworkManager gdm bluetooth && \
 systemctl set-default graphical.target && \
 sed -i 's/^\(PermitRootLogin\) yes$/\1 prohibit-password/' /etc/ssh/sshd_config.d/10-archiso.conf && \
 useradd -m -G wheel -g users -s /usr/bin/zsh archiso && \
