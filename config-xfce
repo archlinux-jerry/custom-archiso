@@ -83,6 +83,8 @@ network-manager-applet
 nm-connection-editor
 firefox
 gparted
+kdiskmark
+ttf-droid
 EOF
     cat << EOF > packages.x86_64.remove
 virtualbox-guest-utils-nox

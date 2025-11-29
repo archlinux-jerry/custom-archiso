@@ -144,6 +144,8 @@ totem
 xdg-desktop-portal-gnome
 xdg-user-dirs-gtk
 yelp
+kdiskmark
+ttf-droid
 EOF
     cat << EOF > packages.x86_64.remove
 virtualbox-guest-utils-nox
