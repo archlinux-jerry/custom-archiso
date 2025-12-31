@@ -43,6 +43,7 @@ jobs:
       run: |
         sudo apt update -qq
         sudo apt install -y tree rsync openssh-client qemu-user-static
+        sudo rm -rf /usr/lib/jvm /usr/share/dotnet /usr/share/swift /usr/local/.ghcup /usr/local/share/chromium /opt/microsoft /opt/google
 
     # Runs a single command using the runners shell
     - name: Run makelivecd script
