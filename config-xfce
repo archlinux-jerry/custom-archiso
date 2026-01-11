@@ -72,7 +72,6 @@ EOF
 nano
 bash-completion
 xorg-server
-nvidia
 mesa
 virtualbox-guest-utils
 xfce4
